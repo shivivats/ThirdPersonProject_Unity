@@ -7,7 +7,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour {
-    private PlayerInput playerInput;
+    [SerializeField] private GameInput gameInput;
+    //private PlayerInput playerInput;
     private CharacterController characterController;
 
     private Vector2 currentMovementInput;
@@ -20,25 +21,59 @@ public class PlayerController : MonoBehaviour {
     float rotationFactorPerFrame = 15.0f;
     
     private void Awake() {
-        playerInput = new PlayerInput(); 
-        playerInput.PlayerLocomotion.Move.started += OnMove;
-        playerInput.PlayerLocomotion.Move.performed += OnMove;
-        playerInput.PlayerLocomotion.Move.canceled += OnMove;
+        //playerInput = new PlayerInput(); 
+        //playerInput.PlayerLocomotion.Move.started += OnMove;
+        //playerInput.PlayerLocomotion.Move.performed += OnMove;
+        //playerInput.PlayerLocomotion.Move.canceled += OnMove;
 
-        playerInput.PlayerLocomotion.Run.started += OnRun;
-        playerInput.PlayerLocomotion.Run.canceled += OnRun;
+        //playerInput.PlayerLocomotion.Run.started += OnRun;
+        //playerInput.PlayerLocomotion.Run.canceled += OnRun;
 
         characterController = GetComponent<CharacterController>();
     }
 
-    private void OnRun(InputAction.CallbackContext context) {
-        isRunPressed = context.ReadValueAsButton();
+    private void Start()
+    {
+        gameInput.OnRun += GameInput_OnRun;
+        gameInput.OnJump += GameInput_OnJump;
     }
+
+    private void GameInput_OnJump(object sender, EventArgs e) {
+        throw new NotImplementedException();
+    }
+
+    private void GameInput_OnRun(object sender, EventArgs e)
+    {
+        //isRunPressed = context.ReadValueAsButton();
+        isRunPressed = true;
+    }
+
+    private void Update() {
+        HandleMovement();
+        HandleRotation();
+        HandleGravity();
+    }
+
+    
 
 
     // can also make this function an inline lambda but this is better because we call this three different times
-    private void OnMove(InputAction.CallbackContext context) {
-        currentMovementInput = context.ReadValue<Vector2>();
+    // private void OnMove(InputAction.CallbackContext context) {
+    //     currentMovementInput = context.ReadValue<Vector2>();
+    //     currentMovement.x = currentMovementInput.x;
+    //     currentMovement.z = currentMovementInput.y; // swizzle the values here
+    //     isMovementPressed = currentMovementInput.x != 0 || currentMovementInput.y != 0;
+    //     
+    //     currentRunMovement.x = currentMovementInput.x * 3.0f;
+    //     currentRunMovement.z = currentMovementInput.y * 3.0f;
+    //     
+    // }
+
+    // Update is called once per frame
+  
+
+    private void HandleMovement() {
+        currentMovementInput = gameInput.GetCurrentMovementInput();
         currentMovement.x = currentMovementInput.x;
         currentMovement.z = currentMovementInput.y; // swizzle the values here
         isMovementPressed = currentMovementInput.x != 0 || currentMovementInput.y != 0;
@@ -46,16 +81,7 @@ public class PlayerController : MonoBehaviour {
         currentRunMovement.x = currentMovementInput.x * 3.0f;
         currentRunMovement.z = currentMovementInput.y * 3.0f;
         
-    }
-
-    // Update is called once per frame
-    void Update() {
-        HandleMovement();
-        HandleRotation();
-        HandleGravity();
-    }
-
-    private void HandleMovement() {
+        
         if (isRunPressed) {
             characterController.Move(currentRunMovement * Time.deltaTime);
         } else {
@@ -94,13 +120,6 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-    private void OnEnable() {
-        playerInput.PlayerLocomotion.Enable();
-    }
-
-    private void OnDisable() {
-        playerInput.PlayerLocomotion.Disable();
-    }
 
     public bool IsPlayerMoving() {
         return isMovementPressed;
