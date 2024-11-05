@@ -42,10 +42,10 @@ public class PlayerController : MonoBehaviour {
         throw new NotImplementedException();
     }
 
-    private void GameInput_OnRun(object sender, EventArgs e)
+    private void GameInput_OnRun(object sender, GameInput.OnRunEventArgs e)
     {
         //isRunPressed = context.ReadValueAsButton();
-        isRunPressed = true;
+        isRunPressed = e.started;
     }
 
     private void Update() {

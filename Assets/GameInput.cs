@@ -8,19 +8,29 @@ public class GameInput : MonoBehaviour
 {
     private PlayerInput playerInput;
 
-    public event EventHandler OnRun;
+    public event EventHandler<OnRunEventArgs> OnRun;
+    public class OnRunEventArgs : EventArgs {
+        public bool started;
+    }
+    
     public event EventHandler OnJump;
     
   
     private void Awake() {
         playerInput = new PlayerInput();
-        playerInput.PlayerLocomotion.Run.performed += OnRunPerformed;
+        playerInput.PlayerLocomotion.Run.started += OnRunStarted;
+        playerInput.PlayerLocomotion.Run.canceled += OnRunCanceled;
         
      }
 
-    private void OnRunPerformed(InputAction.CallbackContext obj)
+    private void OnRunStarted(InputAction.CallbackContext obj)
     {
-        OnRun?.Invoke(this, EventArgs.Empty);
+        OnRun?.Invoke(this, new OnRunEventArgs() { started = true });
+    }
+    
+    private void OnRunCanceled(InputAction.CallbackContext obj)
+    {
+        OnRun?.Invoke(this, new OnRunEventArgs() { started = false });
     }
     
 
