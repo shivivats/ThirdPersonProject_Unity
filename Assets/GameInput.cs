@@ -8,29 +8,39 @@ public class GameInput : MonoBehaviour
 {
     private PlayerInput playerInput;
 
-    public event EventHandler<OnRunEventArgs> OnRun;
-    public class OnRunEventArgs : EventArgs {
+    public event EventHandler<OnButtonEventArgs> OnRun;
+    public event EventHandler<OnButtonEventArgs> OnJump;
+    public class OnButtonEventArgs : EventArgs {
         public bool started;
     }
-    
-    public event EventHandler OnJump;
     
   
     private void Awake() {
         playerInput = new PlayerInput();
-        playerInput.PlayerLocomotion.Run.started += OnRunStarted;
-        playerInput.PlayerLocomotion.Run.canceled += OnRunCanceled;
-        
-     }
+        playerInput.PlayerLocomotion.Run.started += Run_Started;
+        playerInput.PlayerLocomotion.Run.canceled += Run_Canceled;
 
-    private void OnRunStarted(InputAction.CallbackContext obj)
-    {
-        OnRun?.Invoke(this, new OnRunEventArgs() { started = true });
+        playerInput.PlayerLocomotion.Jump.started += Jump_Started;
+        playerInput.PlayerLocomotion.Jump.canceled += Jump_canceled;
+
     }
     
-    private void OnRunCanceled(InputAction.CallbackContext obj)
+    private void Jump_Started(InputAction.CallbackContext context) {
+        OnJump?.Invoke(this, new OnButtonEventArgs { started = true });
+    }
+    
+    private void Jump_canceled(InputAction.CallbackContext context) {
+        OnJump?.Invoke(this, new OnButtonEventArgs { started = false });
+    }
+
+    private void Run_Started(InputAction.CallbackContext context)
     {
-        OnRun?.Invoke(this, new OnRunEventArgs() { started = false });
+        OnRun?.Invoke(this, new OnButtonEventArgs() { started = true });
+    }
+    
+    private void Run_Canceled(InputAction.CallbackContext context)
+    {
+        OnRun?.Invoke(this, new OnButtonEventArgs() { started = false });
     }
     
 

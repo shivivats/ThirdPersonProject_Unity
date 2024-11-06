@@ -7,8 +7,9 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour {
+    
     [SerializeField] private GameInput gameInput;
-    //private PlayerInput playerInput;
+    
     private CharacterController characterController;
 
     private Vector2 currentMovementInput;
@@ -20,15 +21,10 @@ public class PlayerController : MonoBehaviour {
     
     float rotationFactorPerFrame = 15.0f;
     
+    float groundedGravity = -0.05f;
+    float gravity = -9.8f;
+    
     private void Awake() {
-        //playerInput = new PlayerInput(); 
-        //playerInput.PlayerLocomotion.Move.started += OnMove;
-        //playerInput.PlayerLocomotion.Move.performed += OnMove;
-        //playerInput.PlayerLocomotion.Move.canceled += OnMove;
-
-        //playerInput.PlayerLocomotion.Run.started += OnRun;
-        //playerInput.PlayerLocomotion.Run.canceled += OnRun;
-
         characterController = GetComponent<CharacterController>();
     }
 
@@ -42,9 +38,8 @@ public class PlayerController : MonoBehaviour {
         throw new NotImplementedException();
     }
 
-    private void GameInput_OnRun(object sender, GameInput.OnRunEventArgs e)
+    private void GameInput_OnRun(object sender, GameInput.OnButtonEventArgs e)
     {
-        //isRunPressed = context.ReadValueAsButton();
         isRunPressed = e.started;
     }
 
@@ -53,24 +48,6 @@ public class PlayerController : MonoBehaviour {
         HandleRotation();
         HandleGravity();
     }
-
-    
-
-
-    // can also make this function an inline lambda but this is better because we call this three different times
-    // private void OnMove(InputAction.CallbackContext context) {
-    //     currentMovementInput = context.ReadValue<Vector2>();
-    //     currentMovement.x = currentMovementInput.x;
-    //     currentMovement.z = currentMovementInput.y; // swizzle the values here
-    //     isMovementPressed = currentMovementInput.x != 0 || currentMovementInput.y != 0;
-    //     
-    //     currentRunMovement.x = currentMovementInput.x * 3.0f;
-    //     currentRunMovement.z = currentMovementInput.y * 3.0f;
-    //     
-    // }
-
-    // Update is called once per frame
-  
 
     private void HandleMovement() {
         currentMovementInput = gameInput.GetCurrentMovementInput();
@@ -109,12 +86,12 @@ public class PlayerController : MonoBehaviour {
         // we need to set gravity like so because the character controller wont check for collisions unless some velocity is present
         
         if (characterController.isGrounded) {
-            float groundedGravity = -0.05f;
+            
             currentMovement.y = groundedGravity;
             currentRunMovement.y = groundedGravity;
         }
         else {
-            float gravity = -9.8f;
+            
             currentMovement.y = gravity;
             currentRunMovement.y = gravity;
         }
